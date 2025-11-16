@@ -1,3 +1,5 @@
+export const config = { runtime: 'nodejs22.x' };
+
 export default async function handler(req, res) {
   const realm = 'Supershield Admin';
   const USER = process.env.ADMIN_USER || 'supershield';

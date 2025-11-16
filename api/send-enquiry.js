@@ -1,3 +1,5 @@
+export const config = { runtime: 'nodejs22.x' };
+
 import nodemailer from 'nodemailer';
 
 export default async function handler(req, res) {
