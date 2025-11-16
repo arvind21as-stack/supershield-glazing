@@ -4,49 +4,180 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Supershield Glazing</title>
+  <meta name="color-scheme" content="light dark">
   <style>
-    :root{--ink:#0f172a;--muted:#64748b;--line:#e5e7eb;--brand:#0284c7;--brand2:#0ea5e9}
-    *{box-sizing:border-box} body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:#fff}
-    .container{max-width:980px;margin:0 auto;padding:16px}
-    .btn{border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;cursor:pointer}
-    input,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    @media(max-width:700px){.grid{grid-template-columns:1fr}}
+    :root{
+      --ink:#0f172a;--muted:#64748b;--line:#e5e7eb;--bg:#f8fafc;--card:#ffffff;
+      --brand:#0284c7;--brand2:#0ea5e9;--accent:#22c55e;--shadow:0 10px 30px rgba(2,8,23,.08)
+    }
+    @media (prefers-color-scheme: dark){
+      :root{ --ink:#e5e7eb; --muted:#94a3b8; --line:#233042; --bg:#0b1220; --card:#0f172a; --shadow:none }
+      body{ background:linear-gradient(to bottom,#0b1220,#0b1220) }
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{font-family:system-ui,Segoe UI,Roboto,Inter,Arial,sans-serif;color:var(--ink);background:linear-gradient(to bottom,var(--bg),#fff 40%)}
+
+    /* Layout */
+    .container{max-width:1100px;margin:0 auto;padding:18px}
+    .row{display:flex;align-items:center}
+    .between{justify-content:space-between}
+    .wrap{flex-wrap:wrap;gap:14px}
+
+    /* Header */
+    header{position:sticky;top:0;z-index:20;background:#ffffffcc;backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
+    .logo{width:44px;height:44px;border-radius:12px;display:block}
+    .title{font-weight:800;letter-spacing:.2px}
+
+    /* Hero */
+    .hero{display:grid;grid-template-columns:1.6fr 1fr;gap:18px}
+    .heroCard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow)}
+    .badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 10px}
+    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+    .pill{border:1px solid var(--line);border-radius:999px;padding:10px 12px;background:var(--card);text-align:center}
+    .ctaRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+
+    /* Card / Form */
+    .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow)}
+    label{display:block;font-size:12px;color:var(--muted);margin:6px 0 6px 2px}
+    input,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:transparent;color:inherit}
+    textarea{min-height:110px;resize:vertical}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .btn{border:1px solid var(--line);border-radius:12px;padding:12px 16px;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;cursor:pointer}
+    .btn.outline{background:transparent;color:var(--ink)}
+    .status{margin-top:8px;font-size:13px;color:var(--muted)}
+    .ok{color:#16a34a}.err{color:#dc2626}
+
+    /* Footer */
+    footer{margin-top:28px;border-top:1px solid var(--line);padding:14px 0;color:var(--muted);font-size:13px}
+    .footGrid{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+    @media(max-width:900px){
+      .hero{grid-template-columns:1fr}
+      .features{grid-template-columns:1fr 1fr}
+      .footGrid{grid-template-columns:1fr}
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-      <h1 style="margin:0">Supershield Glazing</h1>
+  <!-- Header -->
+  <header>
+    <div class="container row between wrap">
+      <a class="brand" href="/">
+        <!-- Inline SVG logo -->
+        <img id="brandLogo" class="logo" alt="Supershield logo"/>
+        <div>
+          <div class="title">Supershield Glazing</div>
+          <div style="font-size:12px;color:var(--muted)">A-Rated Windows • Doors • Conservatories</div>
+        </div>
+      </a>
       <!-- Hidden admin entrypoint (Basic Auth handled by /api/admin) -->
       <nav><a href="/admin.html" style="display:none">Admin</a></nav>
-    </header>
+    </div>
+  </header>
 
-    <section style="margin-top:12px">
-      <h2 style="margin:6px 0">A-Rated Double Glazing for Warmer, Quieter Homes</h2>
-      <p style="color:var(--muted)">Windows • Doors • Conservatories — FENSA-compliant workmanship and friendly local service.</p>
-      <p><strong>Address:</strong> 4 Fairfield Road, Southall, UB1 2DQ</p>
-    </section>
+  <main class="container" style="margin-top:16px">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="heroCard">
+        <div class="badge">FENSA-compliant • Local family business</div>
+        <h1 style="margin:10px 0 6px">Warmer, Quieter, Safer — with A-Rated Double Glazing</h1>
+        <p style="color:var(--muted);margin:0">
+          Expert supply & installation of uPVC windows, composite doors, and conservatories across West London.
+        </p>
 
-    <section style="margin-top:24px">
-      <h3 style="margin:6px 0">Request a Callback</h3>
-      <form id="enqForm" class="grid" style="max-width:720px">
-        <input name="firstName" placeholder="First name" required>
-        <input name="lastName" placeholder="Last name" required>
-        <input name="email" type="email" placeholder="Email" required>
-        <input name="phone" placeholder="Mobile (optional)">
-        <textarea name="message" placeholder="What do you need?" style="grid-column:1/-1" rows="5"></textarea>
-        <button type="submit" class="btn" style="grid-column:1/-1">Send</button>
-      </form>
-      <div id="enqStatus" style="margin-top:8px;color:#64748b"></div>
-      <div style="margin-top:16px;color:#64748b;font-size:12px">
-        Page OK • If you see this, HTML rendered successfully.
+        <div class="features">
+          <div class="pill">Energy efficient</div>
+          <div class="pill">Trusted installation</div>
+          <div class="pill">10-year guarantee</div>
+        </div>
+
+        <div class="ctaRow">
+          <a href="#enquiry" class="btn">Request a Callback</a>
+          <a href="#contact" class="btn outline">Visit our showroom</a>
+        </div>
+      </div>
+
+      <div class="card" id="contact">
+        <h3 style="margin:6px 0">Showroom</h3>
+        <div style="color:var(--muted)">4 Fairfield Road, Southall, UB1 2DQ</div>
+        <div style="margin-top:10px;border:1px solid var(--line);border-radius:14px;aspect-ratio:4/3;display:grid;place-items:center;color:var(--muted)">
+          Map placeholder
+        </div>
+        <div style="margin-top:10px;color:var(--muted);font-size:12px">
+          Mon–Sat 9:00–17:30 • Sun by appointment
+        </div>
       </div>
     </section>
-  </div>
+
+    <!-- Enquiry -->
+    <section id="enquiry" class="card" style="margin-top:16px">
+      <h3 style="margin:6px 0">Request a Callback</h3>
+      <form id="enqForm" class="grid2" style="max-width:760px">
+        <div>
+          <label for="firstName">First name</label>
+          <input id="firstName" name="firstName" placeholder="Jane" required>
+        </div>
+        <div>
+          <label for="lastName">Last name</label>
+          <input id="lastName" name="lastName" placeholder="Smith" required>
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="name@email.com" required>
+        </div>
+        <div>
+          <label for="phone">Mobile (optional)</label>
+          <input id="phone" name="phone" placeholder="07...">
+        </div>
+        <div style="grid-column:1/-1">
+          <label for="message">What do you need?</label>
+          <textarea id="message" name="message" placeholder="e.g. 5 uPVC casement windows and a composite front door"></textarea>
+        </div>
+        <div style="grid-column:1/-1;display:flex;gap:10px;align-items:center">
+          <button type="submit" class="btn">Send</button>
+          <div id="enqStatus" class="status"></div>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footGrid">
+      <div>
+        <strong>Supershield Glazing</strong><br/>
+        Trading address: 4 Fairfield Road, Southall, UB1 2DQ<br/>
+        Email: <a href="mailto:ssupershield@yahoo.com">ssupershield@yahoo.com</a>
+      </div>
+      <div style="text-align:right">
+        <div>© <span id="year"></span> Supershield Glazing</div>
+        <div style="font-size:12px;color:var(--muted)">All prices/quotes are private and handled securely.</div>
+      </div>
+    </div>
+  </footer>
 
   <script>
-    // Simple, resilient POST helper so non-JSON responses don't break the page
+    // Inline SVG logo (light/dark friendly)
+    const SUPER_LOGO =
+      "data:image/svg+xml;utf8," + encodeURIComponent(
+        `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 80'>
+          <defs>
+            <linearGradient id='g' x1='0' x2='1'>
+              <stop offset='0' stop-color='#0ea5e9'/><stop offset='1' stop-color='#0369a1'/>
+            </linearGradient>
+          </defs>
+          <rect x='10' y='10' width='60' height='60' rx='12' fill='url(#g)'/>
+          <path d='M25 50 l10 -20 l10 20' stroke='white' stroke-width='4' fill='none' stroke-linecap='round' stroke-linejoin='round'/>
+          <text x='90' y='52' font-family='Inter,Arial,sans-serif' font-weight='700' font-size='28' fill='currentColor'>Supershield Glazing</text>
+        </svg>`
+      );
+    document.getElementById('brandLogo').src = SUPER_LOGO;
+
+    // Footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Resilient POST helper (so non-JSON responses don't break the page)
     async function postJSON(url, data){
       const resp = await fetch(url, {
         method:'POST',
@@ -69,24 +200,25 @@
     f.addEventListener('submit', async (e)=>{
       e.preventDefault();
       const data = Object.fromEntries(new FormData(f).entries());
-      statusEl.style.color = '#64748b';
+      statusEl.className = 'status';
       statusEl.textContent = 'Sending…';
       try{
         const res = await postJSON('/api/send-enquiry', data);
         if(res.ok){
-          statusEl.style.color = 'green';
+          statusEl.className = 'status ok';
           statusEl.textContent = 'Thanks! We’ll be in touch.';
           f.reset();
         }else{
-          statusEl.style.color = 'crimson';
+          statusEl.className = 'status err';
           statusEl.textContent = 'Error: ' + (res.error || 'Failed to send');
         }
       }catch(err){
-        statusEl.style.color = 'crimson';
+        statusEl.className = 'status err';
         statusEl.textContent = err.message || 'Network error';
       }
     });
   </script>
+
   <noscript>Your browser has JavaScript disabled; the enquiry form needs JS to send.</noscript>
 </body>
 </html>
