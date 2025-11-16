@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     res.setHeader('WWW-Authenticate', `Basic realm="${realm}"`);
     return res.status(401).send('Authentication required.');
   }
-  const b64 = auth.split(' ')[1] || '';
+  const b64 = (auth.split(' ')[1] || '');
   let decoded = '';
   try { decoded = Buffer.from(b64, 'base64').toString('utf8'); } catch {}
   const [u = '', p = ''] = decoded.split(':');

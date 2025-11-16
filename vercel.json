@@ -1,6 +1,6 @@
 {
   "rewrites": [
-    { "source": "/admin.html", "destination": "/api/admin-protect" }
+    { "source": "/admin.html", "destination": "/api/admin" }
   ],
   "outputDirectory": "public"
 }
