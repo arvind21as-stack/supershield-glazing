@@ -1,8 +1,92 @@
-<!doctype html><meta charset="utf-8">
-<title>Supershield • Minimal</title>
-<pre id="out">loading…</pre>
-<script>
-fetch('/api/hello').then(r=>r.json()).then(j=>{
-  out.textContent = JSON.stringify(j,null,2);
-}).catch(e=>out.textContent=String(e));
-</script>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Supershield Glazing</title>
+  <style>
+    :root{--ink:#0f172a;--muted:#64748b;--line:#e5e7eb;--brand:#0284c7;--brand2:#0ea5e9}
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:#fff}
+    .container{max-width:980px;margin:0 auto;padding:16px}
+    .btn{border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;cursor:pointer}
+    input,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    @media(max-width:700px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+      <h1 style="margin:0">Supershield Glazing</h1>
+      <!-- Hidden admin entrypoint (Basic Auth handled by /api/admin) -->
+      <nav><a href="/admin.html" style="display:none">Admin</a></nav>
+    </header>
+
+    <section style="margin-top:12px">
+      <h2 style="margin:6px 0">A-Rated Double Glazing for Warmer, Quieter Homes</h2>
+      <p style="color:var(--muted)">Windows • Doors • Conservatories — FENSA-compliant workmanship and friendly local service.</p>
+      <p><strong>Address:</strong> 4 Fairfield Road, Southall, UB1 2DQ</p>
+    </section>
+
+    <section style="margin-top:24px">
+      <h3 style="margin:6px 0">Request a Callback</h3>
+      <form id="enqForm" class="grid" style="max-width:720px">
+        <input name="firstName" placeholder="First name" required>
+        <input name="lastName" placeholder="Last name" required>
+        <input name="email" type="email" placeholder="Email" required>
+        <input name="phone" placeholder="Mobile (optional)">
+        <textarea name="message" placeholder="What do you need?" style="grid-column:1/-1" rows="5"></textarea>
+        <button type="submit" class="btn" style="grid-column:1/-1">Send</button>
+      </form>
+      <div id="enqStatus" style="margin-top:8px;color:#64748b"></div>
+      <div style="margin-top:16px;color:#64748b;font-size:12px">
+        Page OK • If you see this, HTML rendered successfully.
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Simple, resilient POST helper so non-JSON responses don't break the page
+    async function postJSON(url, data){
+      const resp = await fetch(url, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+      });
+      const ct = resp.headers.get('content-type') || '';
+      if(!ct.includes('application/json')){
+        const text = await resp.text();
+        throw new Error(`Non-JSON (${resp.status}): ${text.slice(0,120)}`);
+      }
+      const json = await resp.json();
+      if(!resp.ok) throw new Error(json.error || `HTTP ${resp.status}`);
+      return json;
+    }
+
+    const f = document.getElementById('enqForm');
+    const statusEl = document.getElementById('enqStatus');
+
+    f.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(f).entries());
+      statusEl.style.color = '#64748b';
+      statusEl.textContent = 'Sending…';
+      try{
+        const res = await postJSON('/api/send-enquiry', data);
+        if(res.ok){
+          statusEl.style.color = 'green';
+          statusEl.textContent = 'Thanks! We’ll be in touch.';
+          f.reset();
+        }else{
+          statusEl.style.color = 'crimson';
+          statusEl.textContent = 'Error: ' + (res.error || 'Failed to send');
+        }
+      }catch(err){
+        statusEl.style.color = 'crimson';
+        statusEl.textContent = err.message || 'Network error';
+      }
+    });
+  </script>
+  <noscript>Your browser has JavaScript disabled; the enquiry form needs JS to send.</noscript>
+</body>
+</html>
