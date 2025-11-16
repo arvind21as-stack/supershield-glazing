@@ -2,7 +2,7 @@ export const config = { runtime: 'nodejs' };
 
 import nodemailer from 'nodemailer';
 
-// Inline SVG logo (email-safe, no external requests)
+// Inline SVG logo for email footer
 const LOGO_SVG = `
 <svg width="120" height="28" viewBox="0 0 420 80" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Supershield Glazing">
   <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#0ea5e9"/><stop offset="1" stop-color="#0369a1"/></linearGradient></defs>
@@ -11,7 +11,6 @@ const LOGO_SVG = `
   <text x="90" y="55" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="26" fill="#0f172a">Supershield Glazing</text>
 </svg>`.trim();
 
-// Small, robust HTML email wrapper
 function wrapHtml(title, bodyHtml) {
   return `<!doctype html>
 <html><head><meta charset="utf-8">
@@ -22,9 +21,7 @@ function wrapHtml(title, bodyHtml) {
     <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:18px">
       ${bodyHtml}
       <hr style="margin:18px 0;border:none;border-top:1px solid #e5e7eb">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="display:inline-block;vertical-align:middle">${LOGO_SVG}</div>
-      </div>
+      <div style="display:flex;align-items:center;gap:10px">${LOGO_SVG}</div>
       <div style="margin-top:8px;color:#64748b;font-size:12px;line-height:1.5">
         4 Fairfield Road, Southall, UB1 2DQ
       </div>
@@ -34,6 +31,49 @@ function wrapHtml(title, bodyHtml) {
     </div>
   </div>
 </body></html>`;
+}
+
+function buildTransports({ host, port, user, pass }) {
+  // Try requested port first (often 465 for Yahoo), then STARTTLS 587
+  const prefer465 = Number(port) === 465 || !port;
+  const list = prefer465
+    ? [
+        { host, port: Number(port) || 465, secure: true },
+        { host, port: 587, secure: false }
+      ]
+    : [
+        { host, port: Number(port), secure: Number(port) === 465 },
+        { host, port: 465, secure: true }
+      ];
+  return list.map(c => ({
+    config: c,
+    create() {
+      return nodemailer.createTransport({
+        host: c.host,
+        port: c.port,
+        secure: c.secure,
+        auth: { user, pass }
+      });
+    }
+  }));
+}
+
+async function sendWithFallback(mailerList, mailOptions) {
+  let lastErr = null;
+  for (const t of mailerList) {
+    try {
+      const tr = t.create();
+      // quick verify to catch EAUTH/ECONNECTION earlier
+      await tr.verify();
+      return await tr.sendMail(mailOptions);
+    } catch (e) {
+      lastErr = e;
+      // try next config
+    }
+  }
+  const e = lastErr || new Error('Unknown SMTP error');
+  e._isSendFailure = true;
+  throw e;
 }
 
 export default async function handler(req, res) {
@@ -48,22 +88,21 @@ export default async function handler(req, res) {
 
   const {
     TO_EMAIL, SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS,
-    FROM_NAME = 'Supershield Website', // admin notification display name
-    REPLY_TO  = ''                     // optional override for admin reply-to
+    FROM_NAME = 'Supershield Website', REPLY_TO = ''
   } = process.env;
 
   if (!TO_EMAIL || !SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS) {
     return res.status(500).json({ ok: false, error: 'SMTP is not configured on the server' });
   }
 
-  const transporter = nodemailer.createTransport({
+  const mailers = buildTransports({
     host: SMTP_HOST,
-    port: Number(SMTP_PORT),
-    secure: Number(SMTP_PORT) === 465,
-    auth: { user: SMTP_USER, pass: SMTP_PASS }
+    port: SMTP_PORT,
+    user: SMTP_USER,
+    pass: SMTP_PASS
   });
 
-  // --- 1) Admin notification (unchanged) ---
+  // --- 1) Admin notification ---
   const adminSubject = `Enquiry from ${firstName} ${lastName}`.slice(0, 140);
   const adminText = [
     `Name: ${firstName} ${lastName}`,
@@ -86,7 +125,7 @@ export default async function handler(req, res) {
   );
 
   try {
-    await transporter.sendMail({
+    await sendWithFallback(mailers, {
       from: `"${FROM_NAME}" <${SMTP_USER}>`,
       to: TO_EMAIL,
       subject: adminSubject,
@@ -95,11 +134,12 @@ export default async function handler(req, res) {
       replyTo: REPLY_TO || email
     });
   } catch (err) {
-    console.error('Admin mail error:', err);
+    // Log detail for Vercel logs, but keep response tidy for users
+    console.error('Admin mail error:', { code: err.code, responseCode: err.responseCode, message: err.message });
     return res.status(500).json({ ok: false, error: 'Failed to send admin email' });
   }
 
-  // --- 2) Client auto-reply with logo + address ---
+  // --- 2) Client auto-reply (best-effort) ---
   let clientSent = false;
   try {
     const clientSubject = `Thanks, we received your enquiry`.slice(0, 140);
@@ -113,8 +153,7 @@ export default async function handler(req, res) {
        </div>`
     );
 
-    await transporter.sendMail({
-      // Force the display name to "Supershield Glazing" for the client reply
+    await sendWithFallback(mailers, {
       from: `"Supershield Glazing" <${SMTP_USER}>`,
       to: email,
       subject: clientSubject,
@@ -130,11 +169,9 @@ ${message || '-'}
 4 Fairfield Road, Southall, UB1 2DQ`,
       html: clientHtml
     });
-
     clientSent = true;
   } catch (err) {
-    // Best-effort: do not fail the whole request if the client auto-reply fails
-    console.warn('Client auto-reply failed:', err?.message || err);
+    console.warn('Client auto-reply failed:', { code: err.code, responseCode: err.responseCode, message: err.message });
   }
 
   return res.status(200).json({ ok: true, clientAutoReply: clientSent });
