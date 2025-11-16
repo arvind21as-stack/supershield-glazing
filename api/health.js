@@ -1,4 +1,4 @@
-export const config = { runtime: 'nodejs22.x' };
+export const config = { runtime: 'nodejs' };
 export default function handler(req, res){
   const vars = ['TO_EMAIL','SMTP_HOST','SMTP_PORT','SMTP_USER','SMTP_PASS','ADMIN_USER','ADMIN_PASS'];
   const present = vars.filter(k => process.env[k]);
