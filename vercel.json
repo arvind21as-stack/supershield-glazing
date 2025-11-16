@@ -6,8 +6,7 @@
     { "source": "/(.*)", "headers": [ { "key": "Cache-Control", "value": "no-store" } ] }
   ],
   "functions": {
-    "api/**.js": { "runtime": "nodejs22.x" },
-    "api/**.mjs": { "runtime": "nodejs22.x" }
+    "api/**": { "runtime": "nodejs22.x" }
   },
   "outputDirectory": "public"
 }
