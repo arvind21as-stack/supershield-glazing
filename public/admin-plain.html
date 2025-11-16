@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Admin • Supershield Glazing (No PIN)</title>
+<meta name="robots" content="noindex,nofollow"/>
+<style>
+  :root{--ink:#0f172a;--muted:#64748b;--line:#e5e7eb;--bg:#f6f7fb;--card:#fff;--brand:#0284c7;--brand2:#0ea5e9;--shadow:0 6px 20px rgba(2,8,23,.06)}
+  *{box-sizing:border-box} body{margin:0;font-family:system-ui,Segoe UI,Roboto,Inter,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+  header{position:sticky;top:0;background:#ffffffcc;backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+  .container{max-width:1000px;margin:0 auto;padding:12px 16px}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+  .btn{border:1px solid var(--line);border-radius:12px;padding:8px 12px;background:#fff;cursor:pointer}
+  .btn.primary{border-color:var(--brand2);background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  input,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--ink)}
+  table{width:100%;border-collapse:collapse;font-size:14px} th,td{padding:8px;border-bottom:1px solid var(--line);text-align:left} th{color:var(--muted)} .right{text-align:right}
+  @media(max-width:900px){.grid-2{grid-template-columns:1fr}} @media print{header,select,button{display:none!important} body{background:#fff}}
+</style>
+</head><body>
+<header>
+  <div class="container row">
+    <div style="display:flex;gap:12px;align-items:center">
+      <strong>Admin — Supershield Glazing</strong>
+      <span style="color:var(--muted);font-size:12px">4 Fairfield Road, Southall, UB1 2DQ</span>
+    </div>
+    <button id="printBtn" class="btn primary">Print / Save PDF</button>
+  </div>
+</header>
+<main class="container">
+  <section class="card">
+    <div class="row" style="gap:8px;flex-wrap:wrap">
+      <button class="btn" id="loadQ">Sample Quote</button>
+      <button class="btn" id="loadI">Sample Invoice</button>
+      <div style="flex:1"></div>
+      <select id="docType" class="btn" style="padding:8px 12px"><option>Quote</option><option>Invoice</option></select>
+    </div>
+  </section>
+
+  <section class="grid-2">
+    <div class="card">
+      <h3 style="margin:6px 0">Client</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div><div style="color:#64748b;font-size:12px">Name</div><input id="cName" placeholder="Jane Smith"></div>
+        <div><div style="color:#64748b;font-size:12px">Phone</div><input id="cPhone" placeholder="07..."></div>
+      </div>
+      <div style="margin-top:8px"><div style="color:#64748b;font-size:12px">Client Address</div><textarea id="cAddr" rows="4" placeholder="Line 1&#10;Town&#10;Postcode"></textarea></div>
+      <div style="margin-top:8px"><div style="color:#64748b;font-size:12px">Work Address</div><textarea id="wAddr" rows="4" placeholder="Line 1&#10;Town&#10;Postcode"></textarea></div>
+      <div style="margin-top:8px"><div style="color:#64748b;font-size:12px">Description of Work</div><textarea id="wDesc" rows="4" placeholder="e.g. Supply and fit A-rated units..."></textarea></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:6px 0">Lines</h3>
+      <table>
+        <thead><tr>
+          <th>Description</th><th style="width:70px">Qty</th><th style="width:110px">Unit £</th>
+          <th class="right" style="width:120px">Line Total</th><th class="right" style="width:40px">×</th>
+        </tr></thead>
+        <tbody id="itemsBody"></tbody>
+      </table>
+      <button class="btn" id="addLine" style="margin-top:6px">Add Line</button>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:12px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <div style="font-weight:800;font-size:18px">Supershield Glazing</div>
+        <div id="docCompany" style="white-space:pre-line;color:#64748b;font-size:12px">4 Fairfield Road, Southall, UB1 2DQ</div>
+      </div>
+      <div style="text-align:right">
+        <div id="pType" style="font-weight:800;font-size:24px">Quote</div>
+        <div id="pNo" style="color:#64748b;font-size:12px">No. DG-</div>
+        <div id="pDate" style="color:#64748b;font-size:12px">Date:</div>
+      </div>
+    </div>
+    <hr/>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div><div style="color:#64748b;font-size:12px">Client</div><div id="pClient" style="font-weight:600">—</div><div id="pClientAddr" style="white-space:pre-line"></div></div>
+      <div><div style="color:#64748b;font-size:12px">Work Address</div><div id="pWorkAddr" style="white-space:pre-line"></div></div>
+    </div>
+    <div id="descWrap" style="margin-top:16px;display:none"><div style="font-weight:600;margin-bottom:4px">Description of Work</div><div id="pDesc" style="white-space:pre-line"></div></div>
+    <div style="margin-top:16px">
+      <table>
+        <thead><tr><th>Item</th><th style="width:70px">Qty</th><th style="width:110px">Unit</th><th class="right" style="width:120px">Line Total</th></tr></thead>
+        <tbody id="pItemsBody"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:16px;display:flex;justify-content:flex-end"><div style="width:280px">
+      <div style="display:flex;justify-content:space-between;padding:6px 0;font-weight:700;border-top:1px solid var(--line)">
+        <div>Total</div><div id="pTotal">£0.00</div>
+      </div></div></div>
+  </section>
+</main>
+
+<script>
+var GBP=n=>new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP'}).format(+n||0);
+var uid=()=>Math.random().toString(36).slice(2,9);
+var today=()=>new Date().toISOString().slice(0,10);
+function sample(){return{id:uid(),type:'Quote',number:'DG-'+new Date().getFullYear()+'-'+String(Math.floor(Math.random()*1e4)).padStart(4,'0'),date:today(),company:{name:'Supershield Glazing',address:'4 Fairfield Road, Southall, UB1 2DQ'},client:{name:'Ms Jane Smith',phone:'',address:'22 Oak Crescent\nAnytown\nAB1 2CD'},workAddress:'22 Oak Crescent\nAnytown\nAB1 2CD',workDescription:'Survey, supply and installation of A-rated double glazed units.',items:[{id:uid(),description:'uPVC Casement Window (white)',qty:3,unitPrice:265},{id:uid(),description:'Composite Front Door (anthracite, glazed)',qty:1,unitPrice:1050}]}};
+var DOC=sample();
+var cName=document.getElementById('cName'),cPhone=document.getElementById('cPhone'),cAddr=document.getElementById('cAddr'),wAddr=document.getElementById('wAddr'),wDesc=document.getElementById('wDesc');
+var itemsBody=document.getElementById('itemsBody'),pItemsBody=document.getElementById('pItemsBody');
+function renderEditor(){cName.value=DOC.client.name||'';cPhone.value=DOC.client.phone||'';cAddr.value=DOC.client.address||'';wAddr.value=DOC.workAddress||'';wDesc.value=DOC.workDescription||'';itemsBody.innerHTML=DOC.items.map(it=>`<tr data-id="${it.id}"><td><input value="${String(it.description).replace(/"/g,'&quot;')}"></td><td><input type="number" min="0" value="${it.qty}"></td><td><input type="number" min="0" step="0.01" value="${it.unitPrice}"></td><td class="right" style="font-weight:600">${GBP(it.qty*it.unitPrice)}</td><td class="right"><button class="btn" onclick="removeLine('${it.id}')">×</button></td></tr>`).join('')}
+function sync(){DOC.client.name=cName.value.trim();DOC.client.phone=cPhone.value.trim();DOC.client.address=cAddr.value;DOC.workAddress=wAddr.value;DOC.workDescription=wDesc.value;itemsBody.querySelectorAll('tr').forEach(tr=>{var id=tr.getAttribute('data-id');var [d,q,u]=tr.querySelectorAll('input');var it=DOC.items.find(x=>x.id===id);if(!it)return;it.description=d.value;it.qty=+q.value||0;it.unitPrice=+u.value||0})}
+function renderPrintable(){document.getElementById('docCompany').textContent=DOC.company.address;document.getElementById('pType').textContent=DOC.type;document.getElementById('pNo').textContent='No. '+DOC.number;document.getElementById('pDate').textContent='Date: '+DOC.date;document.getElementById('pClient').textContent=DOC.client.name||'—';document.getElementById('pClientAddr').textContent=DOC.client.address||'';document.getElementById('pWorkAddr').textContent=DOC.workAddress||DOC.client.address||'';var show=!!(DOC.workDescription&&DOC.workDescription.trim());document.getElementById('descWrap').style.display=show?'block':'none';if(show)document.getElementById('pDesc').textContent=DOC.workDescription;pItemsBody.innerHTML=DOC.items.map(it=>{var safe=String(it.description).replace(/[<>&]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]));return `<tr><td>${safe}</td><td>${it.qty}</td><td>${GBP(it.unitPrice)}</td><td class="right" style="font-weight:600">${GBP(it.qty*it.unitPrice)}</td></tr>`}).join('');var total=DOC.items.reduce((s,it)=>s+(it.qty||0)*(it.unitPrice||0),0);document.getElementById('pTotal').textContent=GBP(total)}
+function addLine(){DOC.items.push({id:uid(),description:'',qty:1,unitPrice:0});renderEditor();renderPrintable()}
+function removeLine(id){DOC.items=DOC.items.filter(x=>x.id!==id);renderEditor();renderPrintable()}
+document.getElementById('addLine').onclick=addLine;itemsBody.addEventListener('input',()=>{sync();renderPrintable()});['cName','cPhone','cAddr','wAddr','wDesc'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{sync();renderPrintable()}));document.getElementById('printBtn').onclick=()=>window.print();document.getElementById('loadQ').onclick=()=>{DOC=sample();DOC.type='Quote';document.getElementById('docType').value='Quote';renderEditor();renderPrintable()};document.getElementById('loadI').onclick=()=>{DOC=sample();DOC.type='Invoice';document.getElementById('docType').value='Invoice';renderEditor();renderPrintable()};document.getElementById('docType').addEventListener('change',function(){DOC.type=this.value;renderPrintable()});renderEditor();renderPrintable();
+</script>
+</body></html>

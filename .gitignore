@@ -1,0 +1,8 @@
+node_modules/
+.next/
+out/
+dist/
+.vercel/
+.DS_Store
+# Windows reserved name noise
+NUL

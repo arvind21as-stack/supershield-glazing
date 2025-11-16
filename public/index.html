@@ -1,0 +1,58 @@
+<!doctype html><meta charset="utf-8">
+<title>Supershield Glazing</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<div style="font-family:system-ui,Segoe UI,Roboto,Arial;padding:16px;max-width:980px;margin:0 auto">
+  <header style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+    <h1 style="margin:0">Supershield Glazing</h1>
+    <!-- Admin link hidden from public -->
+    <nav><a href="/admin.html" style="display:none">Admin</a></nav>
+  </header>
+
+  <section style="margin-top:16px">
+    <h2>A-Rated Double Glazing for Warmer, Quieter Homes</h2>
+    <p>Windows • Doors • Conservatories — FENSA-compliant workmanship and friendly local service.</p>
+    <p><strong>Address:</strong> 4 Fairfield Road, Southall, UB1 2DQ</p>
+  </section>
+
+  <section style="margin-top:24px">
+    <h3>Request a Callback</h3>
+    <form id="enqForm" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:720px">
+      <input name="firstName" placeholder="First name" required>
+      <input name="lastName" placeholder="Last name" required>
+      <input name="email" type="email" placeholder="Email" required>
+      <input name="phone" placeholder="Mobile (optional)">
+      <textarea name="message" placeholder="What do you need?" style="grid-column:1/-1" rows="5"></textarea>
+      <button type="submit" style="grid-column:1/-1;padding:10px;border:1px solid #e5e7eb;border-radius:10px;background:#0284c7;color:#fff">Send</button>
+    </form>
+    <div id="enqStatus" style="margin-top:8px;color:#64748b"></div>
+  </section>
+</div>
+<script>
+  const f = document.getElementById('enqForm');
+  const statusEl = document.getElementById('enqStatus');
+  f.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(f).entries());
+    statusEl.style.color = '#64748b';
+    statusEl.textContent = 'Sending…';
+    try{
+      const resp = await fetch('/api/send-enquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const json = await resp.json();
+      if(json.ok){
+        statusEl.style.color = 'green';
+        statusEl.textContent = 'Thanks! We’ll be in touch.';
+        f.reset();
+      }else{
+        statusEl.style.color = 'crimson';
+        statusEl.textContent = 'Error: ' + (json.error || 'Failed to send');
+      }
+    }catch(err){
+      statusEl.style.color = 'crimson';
+      statusEl.textContent = 'Network error.';
+    }
+  });
+</script>
